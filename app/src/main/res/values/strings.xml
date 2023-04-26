@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">ToDo</string>
+    <string name="action_settings">Settings</string>
+    <string name="dialog_title">Add Item</string>
+    <string name="dialog_positive_button">CREATE</string>
+    <string name="add_item_dialog_box_desc">add item dialog box</string>
+    <string name="detail_fab_content_description">fab to add detail tasks</string>
+    <string name="detailTaskAdd">Please add a task to the %1$s category</string>
+    <string name="detailDialogfabButton">Add Task</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Strings used for fragments for navigation -->
+</resources>
