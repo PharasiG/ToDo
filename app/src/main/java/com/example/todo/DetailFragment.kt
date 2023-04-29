@@ -3,18 +3,24 @@ package com.example.todo
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class DetailFragment : Fragment() {
 
     private lateinit var detailRecyclerView: RecyclerView
     private lateinit var list: TaskList
+    private lateinit var detailFab: FloatingActionButton
 
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -32,6 +38,11 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        detailFab = view.findViewById(R.id.detailFloatingActionButton)
+        detailFab.setOnClickListener {
+            addDetailTaskDialog()
+        }
+
         detailRecyclerView = view.findViewById(R.id.detail_task_recycler)
         detailRecyclerView.layoutManager = LinearLayoutManager(activity)
         detailRecyclerView.adapter = DetailTaskAdapter(list)
@@ -46,9 +57,9 @@ class DetailFragment : Fragment() {
 //        requireActivity().title = list.name
 //    }
 
-    fun getDialogTitle(): String = getString(R.string.detailTaskAdd, list.name)
+    private fun getDialogTitle(): String = getString(R.string.detailTaskAdd, list.name)
 
-    fun addItem(text: String) {
+    private fun addItem(text: String) {
         (detailRecyclerView.adapter as DetailTaskAdapter).addItem(text)
     }
 
@@ -56,6 +67,20 @@ class DetailFragment : Fragment() {
         val intent = Intent()
         intent.putExtra(MainActivity.INTENT_LIST_KEY, list)
         activity?.setResult(Activity.RESULT_OK, intent)
+    }
+
+    private fun addDetailTaskDialog() {
+        activity?.also {
+            val editText = EditText(it)
+            editText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
+            val dialogTitle = getDialogTitle()
+            AlertDialog.Builder(it).setTitle(dialogTitle).setView(editText)
+                .setPositiveButton(R.string.detailDialogfabButton) { dialog, _ ->
+                    val text = editText.text.toString()
+                    addItem(text)
+                    dialog.dismiss()
+                }.create().show()
+        }
     }
 
     companion object {
