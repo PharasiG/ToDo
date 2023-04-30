@@ -1,12 +1,14 @@
 package com.example.todo
 
-import android.content.Context
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.preference.PreferenceManager
 
-class ListDataManager(private val context: Context) {
+class ListDataManager(application: Application) : AndroidViewModel(application) {
+//class ListDataManager(private val context: Context) {
 
     fun readList(): ArrayList<TaskList> {
-        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplication())
         val lists = ArrayList<TaskList>()
         val data = sharedPrefs.all
         for (content in data) {
@@ -18,22 +20,10 @@ class ListDataManager(private val context: Context) {
     }
 
     fun saveList(list: TaskList) {
-        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context).edit()
+        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplication()).edit()
         sharedPrefs.putStringSet(list.name, list.tasks.toHashSet())
         sharedPrefs.apply()
     }
-
-//    fun readTasks(name: String): ArrayList<String> {
-//        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
-//        return ArrayList<String>(sharedPrefs.getStringSet(name, HashSet()))
-//    }
-//
-//    fun saveTask(list: TaskList) {
-//        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context).edit()
-//        sharedPrefs.putStringSet(list.name, list.tasks.toHashSet())
-//        sharedPrefs.apply()
-//    }
-
 }
 
 

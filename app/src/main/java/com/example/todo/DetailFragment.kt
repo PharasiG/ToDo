@@ -1,15 +1,16 @@
 package com.example.todo
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -17,17 +18,25 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 class DetailFragment : Fragment() {
 
     private lateinit var detailRecyclerView: RecyclerView
+    private lateinit var dataManager: ListDataManager
     private lateinit var list: TaskList
     private lateinit var detailFab: FloatingActionButton
+    private lateinit var args: DetailFragmentArgs
 
-    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        list = arguments?.getParcelable(DETAIL_ARG_KEY)!!
-        activity?.title = list.name
+        dataManager = ViewModelProvider(this).get(ListDataManager::class.java)
+        //        list = requireArguments().getParcelable(TodoListFragment.TODO_BUNDLE_KEY)!!
+        requireArguments().also {
+            args = DetailFragmentArgs.fromBundle(it)
+            val name = args.detailListName
+            list = dataManager.readList().filter { list -> list.name == name }[0]
+        }
+        activity?.findViewById<Toolbar>(R.id.toolbar)?.title = list.name
     }
 
+    //
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -43,55 +52,38 @@ class DetailFragment : Fragment() {
             addDetailTaskDialog()
         }
 
-        detailRecyclerView = view.findViewById(R.id.detail_task_recycler)
-        detailRecyclerView.layoutManager = LinearLayoutManager(activity)
-        detailRecyclerView.adapter = DetailTaskAdapter(list)
+        activity?.also {
+            detailRecyclerView = view.findViewById(R.id.detail_task_recycler)
+            detailRecyclerView.layoutManager = LinearLayoutManager(it)
+            detailRecyclerView.adapter = DetailTaskAdapter(list)
+        }
     }
-
-//    @Suppress("DEPRECATION")
-//    override fun onAttach(context: Context) {
-//        super.onAttach(context)
-
-//        list =
-//            activity?.intent?.getParcelableExtra<TaskList>(MainActivity.INTENT_LIST_KEY) as TaskList
-//        requireActivity().title = list.name
-//    }
-
-    private fun getDialogTitle(): String = getString(R.string.detailTaskAdd, list.name)
 
     private fun addItem(text: String) {
         (detailRecyclerView.adapter as DetailTaskAdapter).addItem(text)
-    }
-
-    fun returnResult() {
-        val intent = Intent()
-        intent.putExtra(MainActivity.INTENT_LIST_KEY, list)
-        activity?.setResult(Activity.RESULT_OK, intent)
     }
 
     private fun addDetailTaskDialog() {
         activity?.also {
             val editText = EditText(it)
             editText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
-            val dialogTitle = getDialogTitle()
+            val dialogTitle = getString(R.string.detailTaskAdd, list.name)
             AlertDialog.Builder(it).setTitle(dialogTitle).setView(editText)
                 .setPositiveButton(R.string.detailDialogfabButton) { dialog, _ ->
                     val text = editText.text.toString()
-                    addItem(text)
+                    if (taskNotAlreadyExist(text)) {
+                        addItem(text)
+                        dataManager.saveList(list)
+                    }
                     dialog.dismiss()
                 }.create().show()
         }
     }
 
-    companion object {
-        private const val DETAIL_ARG_KEY = "key for detail fragment argument"
-
-        fun newInstance(list: TaskList) : DetailFragment {
-            val bundle = Bundle()
-            bundle.putParcelable(DETAIL_ARG_KEY, list)
-            val detailFrag = DetailFragment()
-            detailFrag.arguments = bundle
-            return detailFrag
-        }
+    private fun taskNotAlreadyExist(task: String): Boolean {
+        val ans = (detailRecyclerView.adapter as DetailTaskAdapter).taskNotAlreadyExist(task)
+        if (!ans)
+            Toast.makeText(requireContext(), "A Task With The Name \"$task\" Already Exists!", Toast.LENGTH_SHORT).show()
+        return ans
     }
 }

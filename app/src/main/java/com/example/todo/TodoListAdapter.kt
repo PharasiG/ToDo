@@ -35,4 +35,9 @@ class TodoListAdapter(
         lists.add(item)
         notifyItemInserted(lists.size - 1)
     }
+
+    fun listNotAlreadyExist(task: String): Boolean {
+        lists.forEach { if (it.name == task) return false }
+        return true
+    }
 }

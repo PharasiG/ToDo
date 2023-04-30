@@ -8,7 +8,7 @@ class DetailTaskAdapter(private val list: TaskList) : RecyclerView.Adapter<Detai
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailTaskViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.detail_task_view, parent, false)
-        return  DetailTaskViewHolder(view)
+        return DetailTaskViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: DetailTaskViewHolder, position: Int) {
@@ -18,8 +18,12 @@ class DetailTaskAdapter(private val list: TaskList) : RecyclerView.Adapter<Detai
 
     override fun getItemCount(): Int = list.tasks.size
 
-    fun addItem(task : String) {
+    fun addItem(task: String) {
         list.tasks.add(task)
         notifyItemInserted(list.tasks.size - 1)
+    }
+
+    fun taskNotAlreadyExist(task: String): Boolean {
+        return !list.tasks.contains(task)
     }
 }
