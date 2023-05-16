@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -21,18 +22,20 @@ class DetailFragment : Fragment() {
     private lateinit var dataManager: ListDataManager
     private lateinit var list: TaskList
     private lateinit var detailFab: FloatingActionButton
-    private lateinit var args: DetailFragmentArgs
+    private val args by navArgs<DetailFragmentArgs>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         dataManager = ViewModelProvider(this).get(ListDataManager::class.java)
-        //        list = requireArguments().getParcelable(TodoListFragment.TODO_BUNDLE_KEY)!!
+
+//        list = requireArguments().getParcelable(TodoListFragment.TODO_BUNDLE_KEY)!!
         requireArguments().also {
-            args = DetailFragmentArgs.fromBundle(it)
+//          args = DetailFragmentArgs.fromBundle(it)
             val name = args.detailListName
             list = dataManager.readList().filter { list -> list.name == name }[0]
         }
+
         activity?.findViewById<Toolbar>(R.id.toolbar)?.title = list.name
     }
 

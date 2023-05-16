@@ -37,7 +37,8 @@ class TodoListAdapter(
     }
 
     fun listNotAlreadyExist(task: String): Boolean {
-        lists.forEach { if (it.name == task) return false }
-        return true
+        var ans = true;
+        lists.forEach { if (it.name == task) ans = false }
+        return ans
     }
 }
